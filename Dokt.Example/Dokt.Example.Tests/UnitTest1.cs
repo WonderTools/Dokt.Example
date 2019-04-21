@@ -26,26 +26,27 @@ namespace Dokt.Example.Tests
         public void When_get_request_is_made_with_id_as_parameter_then_value_should_be_return()
         {
             var url = "http://google.com/search";
+            var body = "value";
+            _messageHandler
+                .WhenRequest().WithUri(url)
+                .Respond(body).UsingStatusCode(HttpStatusCode.OK);
+
+            var result = _service.GetResult(5);
+
+            Assert.AreEqual(body,result);
+        }
+
+        [Test]
+        public void When_get_request_is_made_with_id_as_parameter_and_response_status_is_other_than_ok_then_value_should_be_return()
+        {
+            var url = "http://google.com/search";
             _messageHandler
                 .WhenRequest().WithUri(url)
                 .Respond().UsingStatusCode(HttpStatusCode.Accepted);
 
             var result = _service.GetResult(5);
 
-            Assert.AreEqual("value",result);
-        }
-
-        [Test]
-        public void When_get_request_is_made_with_id_as_parameter_and_response_status_is_ok_then_value_should_be_return()
-        {
-            var url = "http://google.com/search";
-            _messageHandler
-                .WhenRequest().WithUri(url)
-                .Respond().UsingStatusCode(HttpStatusCode.OK);
-
-            var result = _service.GetResult(5);
-
-            Assert.AreEqual("result is okay", result);
+            Assert.AreEqual(string.Empty, result);
         }
 
         [Test]
@@ -54,16 +55,36 @@ namespace Dokt.Example.Tests
             var url = @"http://google.com/search";
             var responseHttpCode = HttpStatusCode.OK;
             var content = "test";
+            var responseBody = "Content posted successfully";
             _messageHandler
                 .WhenPost()
                 .WithUri(url)
                 .WithContent(x=>x.ReadAsStringAsync().Result.Equals(content))
-                .Respond()
+                .Respond(responseBody)
                 .UsingStatusCode(responseHttpCode);
 
             var result = _service.PostContent(content);
 
-            Assert.AreEqual("Content posted successfully", result);
+            Assert.AreEqual(responseBody, result);
+        }
+
+        [Test]
+        public void When_post_request_is_made_with_request_headers_then_request_result_should_be_returned()
+        {
+            var url = @"http://google.com/search";
+            var responseHttpCode = HttpStatusCode.OK;
+            var content = "test";
+            var responseBody = "Content posted successfully";
+            _messageHandler
+                .WhenPost()
+                .WithUri(url)
+                .WithContent(x => x.ReadAsStringAsync().Result.Equals(content))
+                .Respond(responseBody)
+                .UsingStatusCode(responseHttpCode);
+
+            var result = _service.PostContent(content);
+
+            Assert.AreEqual(responseBody, result);
         }
 
     }
