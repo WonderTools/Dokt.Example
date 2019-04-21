@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Dokt.Example.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dokt.Example.Controllers
@@ -11,11 +9,11 @@ namespace Dokt.Example.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        private readonly HttpClient _client;
+        private readonly IService _service;
 
-        public ValuesController(HttpClient client)
+        public ValuesController(IService service)
         {
-            _client = client;
+            _service = service;
         }
 
         // GET api/values
@@ -29,30 +27,14 @@ namespace Dokt.Example.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<string>> Get(int id)
         {
-            var response =  _client.GetAsync("http://google.com/search").Result;
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return "result is okay";
-            }
-
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return "result did not return anything";
-            }
-            return "value";
+           return _service.GetResult(id);
         }
 
         // POST api/values
         [HttpPost]
         public async Task<ActionResult<string>> Post([FromBody] string value)
         {
-            var response = _client.PostAsync(@"http://google.com/search", new StringContent("test")).Result;
-            if (response.StatusCode==HttpStatusCode.OK)
-            {
-                return "Content posted successfully";
-            }
-
-            return "bad request";
+            return _service.PostContent(value);
         }
 
         // PUT api/values/5

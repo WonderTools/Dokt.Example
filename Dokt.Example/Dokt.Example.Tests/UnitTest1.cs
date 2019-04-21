@@ -1,8 +1,8 @@
-using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using Dokt.Example.Controllers;
+using Dokt.Example.Services;
+using Microsoft.AspNetCore.Http;
 using NUnit.Framework;
 using WonderTools.Dokt;
 
@@ -12,13 +12,14 @@ namespace Dokt.Example.Tests
     {
         private HttpClient _client;
         private DoktHttpMessageHandler _messageHandler;
-        private ValuesController _valuesController;
+        private IService _service;
 
         [SetUp]
         public void Setup()
         {
             _messageHandler=new DoktHttpMessageHandler();
             _client = new HttpClient(_messageHandler);
+            _service = new TestService(_client);
         }
 
         [Test]
@@ -28,12 +29,10 @@ namespace Dokt.Example.Tests
             _messageHandler
                 .WhenRequest().WithUri(url)
                 .Respond().UsingStatusCode(HttpStatusCode.Accepted);
-            
-            _valuesController = new ValuesController(_client);
 
-            var result =  _valuesController.Get(5).Result;
+            var result = _service.GetResult(5);
 
-            Assert.AreEqual("value",result.Value);
+            Assert.AreEqual("value",result);
         }
 
         [Test]
@@ -44,29 +43,27 @@ namespace Dokt.Example.Tests
                 .WhenRequest().WithUri(url)
                 .Respond().UsingStatusCode(HttpStatusCode.OK);
 
-            _valuesController = new ValuesController(_client);
+            var result = _service.GetResult(5);
 
-            var result = _valuesController.Get(5).Result;
-
-            Assert.AreEqual("result is okay", result.Value);
+            Assert.AreEqual("result is okay", result);
         }
 
         [Test]
-        public void When_post_request_is_made_then_request_result_should_be_made()
+        public void When_post_request_is_made_then_request_result_should_be_displayed()
         {
             var url = @"http://google.com/search";
             var responseHttpCode = HttpStatusCode.OK;
+            var content = "test";
             _messageHandler
-                .WhenRequest()
+                .WhenPost()
                 .WithUri(url)
+                .WithContent(x=>x.ReadAsStringAsync().Result.Equals(content))
                 .Respond()
                 .UsingStatusCode(responseHttpCode);
 
-            _valuesController = new ValuesController(_client);
+            var result = _service.PostContent(content);
 
-            var result = _valuesController.Post("defaultValue").Result;
-
-            Assert.AreEqual("Content posted successfully", result.Value);
+            Assert.AreEqual("Content posted successfully", result);
         }
 
     }
