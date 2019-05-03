@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dokt.Example.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dokt.Example.Controllers
@@ -7,6 +9,13 @@ namespace Dokt.Example.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly IService _service;
+
+        public ValuesController(IService service)
+        {
+            _service = service;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -16,15 +25,16 @@ namespace Dokt.Example.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public async Task<ActionResult<string>> Get(int id)
         {
-            return "value";
+           return _service.GetResult(id);
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<ActionResult<string>> Post([FromBody] string value)
         {
+            return _service.PostContent(value);
         }
 
         // PUT api/values/5
