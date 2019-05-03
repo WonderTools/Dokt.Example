@@ -4,16 +4,16 @@ using System.Net.Http.Headers;
 
 namespace Dokt.Example.Services
 {
-    public class TestService:IService
+    public class Service:IService
     {
         private readonly HttpClient _client;
 
-        public TestService()
+        public Service()
         {
             _client = new HttpClient();
         }
 
-        public TestService(HttpClient client)
+        public Service(HttpClient client)
         {
             _client = client;
         }

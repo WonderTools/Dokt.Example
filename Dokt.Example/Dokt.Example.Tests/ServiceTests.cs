@@ -8,7 +8,7 @@ using WonderTools.Dokt;
 
 namespace Dokt.Example.Tests
 {
-    public class Tests
+    public class ServiceTests
     {
         private HttpClient _client;
         private DoktHttpMessageHandler _messageHandler;
@@ -19,7 +19,7 @@ namespace Dokt.Example.Tests
         {
             _messageHandler=new DoktHttpMessageHandler();
             _client = new HttpClient(_messageHandler);
-            _service = new TestService(_client);
+            _service = new Service(_client);
         }
 
         [Test]

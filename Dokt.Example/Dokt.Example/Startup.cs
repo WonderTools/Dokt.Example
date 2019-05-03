@@ -21,7 +21,7 @@ namespace Dokt.Example
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSingleton<IService>(new TestService());
+            services.AddTransient<IService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
